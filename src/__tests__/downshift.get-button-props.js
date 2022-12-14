@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {act, render, fireEvent, waitFor} from '@testing-library/react'
 import Downshift from '../'
 
 jest.useFakeTimers()
@@ -40,7 +40,9 @@ test('button ignores key events it does not handle', () => {
 test('on button blur resets the state', () => {
   const {button, childrenSpy} = setup()
   fireEvent.blur(button)
-  jest.runAllTimers()
+  act(() => {
+    jest.runAllTimers()
+  })
   expect(childrenSpy).toHaveBeenLastCalledWith(
     expect.objectContaining({
       isOpen: false,
@@ -104,18 +106,26 @@ describe('Expect timer to trigger on process.env.NODE_ENV !== test value', () =>
     process.env.NODE_ENV = originalEnv
   })
 
-  test('clicking on the button opens and closes the menu for test', () => {
+  test('clicking on the button opens and closes the menu for test', async () => {
     process.env.NODE_ENV = 'production'
     const {button, childrenSpy} = setup()
     fireEvent.click(button)
-    jest.runAllTimers()
-    expect(childrenSpy).toHaveBeenLastCalledWith(
-      expect.objectContaining({isOpen: true}),
+    act(() => {
+      jest.runAllTimers()
+    })
+    await waitFor(() =>
+      expect(childrenSpy).toHaveBeenLastCalledWith(
+        expect.objectContaining({isOpen: true}),
+      ),
     )
     fireEvent.click(button)
-    jest.runAllTimers()
-    expect(childrenSpy).toHaveBeenLastCalledWith(
-      expect.objectContaining({isOpen: false}),
+    act(() => {
+      jest.runAllTimers()
+    })
+    await waitFor(() =>
+      expect(childrenSpy).toHaveBeenLastCalledWith(
+        expect.objectContaining({isOpen: false}),
+      ),
     )
   })
 })

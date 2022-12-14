@@ -179,7 +179,11 @@ function useEnhancedReducer(reducer, initialState, props) {
   const action = actionRef.current
 
   useEffect(() => {
-    if (action && prevStateRef.current && prevStateRef.current !== state) {
+    if (
+      action &&
+      prevStateRef.current &&
+      JSON.stringify(prevStateRef.current) !== JSON.stringify(state)
+    ) {
       callOnChangeProps(
         action,
         getState(prevStateRef.current, action.props),
@@ -305,7 +309,7 @@ function getHighlightedIndexOnOpen(props, state, offset) {
  * @param {Function} handleBlur Handler on blur from mouse or touch.
  * @returns {Object} Ref containing whether mouseDown or touchMove event is happening
  */
- function useMouseAndTouchTracker(
+function useMouseAndTouchTracker(
   isOpen,
   downshiftElementRefs,
   environment,

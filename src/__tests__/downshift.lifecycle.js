@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {fireEvent, render, screen} from '@testing-library/react'
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react'
 import Downshift from '../'
 import setA11yStatus from '../set-a11y-status'
 import * as utils from '../utils'
@@ -179,7 +179,7 @@ test('props update of selectedItem will update the inputValue state', () => {
   )
 })
 
-test('the callback is invoked on selected item only if it is a function', () => {
+test('the callback is invoked on selected item only if it is a function', async () => {
   let renderArg
   const childrenSpy = jest.fn(controllerArg => {
     renderArg = controllerArg
@@ -190,9 +190,13 @@ test('the callback is invoked on selected item only if it is a function', () => 
 
   childrenSpy.mockClear()
   callbackSpy.mockClear()
-  renderArg.selectItem('foo', {}, callbackSpy)
-  expect(callbackSpy).toHaveBeenCalledTimes(1)
-  renderArg.selectItem('foo', {})
+  act(() => {
+    renderArg.selectItem('foo', {}, callbackSpy)
+  })
+  await waitFor(() => expect(callbackSpy).toHaveBeenCalledTimes(1))
+  act(() => {
+    renderArg.selectItem('foo', {})
+  })
 })
 
 test('props update of selectedItem will not update inputValue state', () => {

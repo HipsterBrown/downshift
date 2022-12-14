@@ -1,6 +1,5 @@
 import * as React from 'react'
-import {act, renderHook} from '@testing-library/react-hooks'
-import {fireEvent, createEvent} from '@testing-library/react'
+import {fireEvent, createEvent, act, renderHook} from '@testing-library/react'
 import * as stateChangeTypes from '../stateChangeTypes'
 import {noop} from '../../../utils'
 import {
@@ -848,7 +847,7 @@ describe('getInputProps', () => {
 
         await keyDownOnInput('{Escape}') // focus input and close the menu.
         renderSpy.mockClear()
-        
+
         await keyDownOnInput('{Escape}')
 
         expect(renderSpy).toHaveBeenCalledTimes(0) // no re-render

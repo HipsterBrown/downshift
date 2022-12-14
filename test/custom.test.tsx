@@ -9,15 +9,15 @@ interface State {
   items: Array<Item>
 }
 
-const CustomList: React.StatelessComponent<{isOpen: boolean}> = ({
+const CustomList: React.FC<React.PropsWithChildren<{isOpen: boolean}>> = ({
   isOpen,
   children,
 }) => <div className={isOpen ? 'open' : ''}>{children}</div>
 
-const CustomListItem: React.StatelessComponent<{isSelected: boolean}> = ({
-  isSelected,
-  children,
-}) => <div className={isSelected ? 'selected' : ''}>{children}</div>
+const CustomListItem: React.FC<React.PropsWithChildren<{isSelected: boolean}>> =
+  ({isSelected, children}) => (
+    <div className={isSelected ? 'selected' : ''}>{children}</div>
+  )
 
 export default class App extends React.Component<Props, State> {
   state: State = {

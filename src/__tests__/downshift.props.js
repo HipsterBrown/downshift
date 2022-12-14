@@ -2,10 +2,10 @@
 // but we still want to have tested.
 
 import * as React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {act, render, fireEvent, waitFor} from '@testing-library/react'
 import Downshift from '../'
 
-test('onStateChange called with changes and downshift state and helpers', () => {
+test('onStateChange called with changes and downshift state and helpers', async () => {
   const handleStateChange = jest.fn()
   const controlledState = {
     inputValue: '',
@@ -28,47 +28,53 @@ test('onStateChange called with changes and downshift state and helpers', () => 
     highlightedIndex: null,
     selectItem,
   }
-  expect(handleStateChange).toHaveBeenLastCalledWith(
-    changes,
-    expect.objectContaining(stateAndHelpers),
-  )
+  await waitFor(() => {
+    expect(handleStateChange).toHaveBeenLastCalledWith(
+      changes,
+      expect.objectContaining(stateAndHelpers),
+    )
+  })
 })
 
-test('onChange called when clearSelection is triggered', () => {
+test('onChange called when clearSelection is triggered', async () => {
   const handleChange = jest.fn()
   const {clearSelection} = setup({
     selectedItem: 'foo',
     onChange: handleChange,
   })
   clearSelection()
-  expect(handleChange).toHaveBeenCalledTimes(1)
+  await waitFor(() => expect(handleChange).toHaveBeenCalledTimes(1))
   expect(handleChange).toHaveBeenCalledWith(null, expect.any(Object))
 })
 
-test('onChange only called when the selection changes', () => {
+test('onChange only called when the selection changes', async () => {
   const handleChange = jest.fn()
   const {selectItem} = setup({
     onChange: handleChange,
   })
   selectItem('foo')
-  expect(handleChange).toHaveBeenCalledTimes(1)
+  await waitFor(() => expect(handleChange).toHaveBeenCalledTimes(1))
   expect(handleChange).toHaveBeenCalledWith('foo', expect.any(Object))
   handleChange.mockClear()
   selectItem('foo')
-  expect(handleChange).toHaveBeenCalledTimes(0)
+  await waitFor(() => expect(handleChange).toHaveBeenCalledTimes(0))
 })
 
-test('onSelect called whenever selection happens, even if the item is the same', () => {
+test('onSelect called whenever selection happens, even if the item is the same', async () => {
   const handleSelect = jest.fn()
   const {selectItem} = setup({
     onSelect: handleSelect,
   })
   selectItem('foo')
-  expect(handleSelect).toHaveBeenCalledTimes(1)
+  await waitFor(() => {
+    expect(handleSelect).toHaveBeenCalledTimes(1)
+  })
   expect(handleSelect).toHaveBeenCalledWith('foo', expect.any(Object))
   handleSelect.mockClear()
   selectItem('foo')
-  expect(handleSelect).toHaveBeenCalledTimes(1)
+  await waitFor(() => {
+    expect(handleSelect).toHaveBeenCalledTimes(1)
+  })
 })
 
 test('onSelect not called when nothing was selected', () => {
@@ -95,13 +101,15 @@ test('uses given environment', () => {
   expect(environment.removeEventListener).toHaveBeenCalledTimes(5)
 })
 
-test('can override onOuterClick callback to maintain isOpen state', () => {
+test('can override onOuterClick callback to maintain isOpen state', async () => {
   const renderFn = () => <div />
   const onOuterClick = jest.fn()
   const {openMenu} = setup({render: renderFn, onOuterClick})
-  openMenu()
+  act(() => {
+    openMenu()
+  })
   mouseDownAndUp(document.body)
-  expect(onOuterClick).toHaveBeenCalledTimes(1)
+  await waitFor(() => expect(onOuterClick).toHaveBeenCalledTimes(1))
   expect(onOuterClick).toHaveBeenCalledWith(
     expect.objectContaining({
       // just verify that it's the controller object
@@ -132,28 +140,30 @@ test('onInputValueChange not called when changes do not contain inputValue', () 
   expect(handleInputValueChange).toHaveBeenCalledTimes(0)
 })
 
-test('onInputValueChange called with empty string on reset', () => {
+test('onInputValueChange called with empty string on reset', async () => {
   const handleInputValueChange = jest.fn()
   const {reset} = setup({
     onInputValueChange: handleInputValueChange,
   })
   reset()
-  expect(handleInputValueChange).toHaveBeenCalledTimes(1)
+  await waitFor(() => expect(handleInputValueChange).toHaveBeenCalledTimes(1))
   expect(handleInputValueChange).toHaveBeenCalledWith('', expect.any(Object))
 })
 
-test('defaultHighlightedIndex will be used for the highlighted index on reset', () => {
+test('defaultHighlightedIndex will be used for the highlighted index on reset', async () => {
   const {reset, childrenSpy} = setup({defaultHighlightedIndex: 0})
   childrenSpy.mockClear()
   reset()
-  expect(childrenSpy).toHaveBeenCalledWith(
-    expect.objectContaining({
-      highlightedIndex: 0,
-    }),
-  )
+  await waitFor(() => {
+    expect(childrenSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        highlightedIndex: 0,
+      }),
+    )
+  })
 })
 
-test('stateReducer customizes the final state after keyDownEnter handled', () => {
+test('stateReducer customizes the final state after keyDownEnter handled', async () => {
   const {childrenSpy, openMenu, selectHighlightedItem} = setup({
     defaultHighlightedIndex: 0,
     stateReducer: (state, stateToSet) => {
@@ -174,12 +184,14 @@ test('stateReducer customizes the final state after keyDownEnter handled', () =>
   selectHighlightedItem({
     type: Downshift.stateChangeTypes.keyDownEnter,
   })
-  expect(childrenSpy).toHaveBeenCalledWith(
-    expect.objectContaining({
-      isOpen: true,
-      highlightedIndex: 0,
-    }),
-  )
+  await waitFor(() => {
+    expect(childrenSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        isOpen: true,
+        highlightedIndex: 0,
+      }),
+    )
+  })
 })
 
 function mouseDownAndUp(node) {

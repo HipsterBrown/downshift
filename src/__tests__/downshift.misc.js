@@ -3,7 +3,7 @@
 
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import {render} from '@testing-library/react'
+import {act, render, waitFor} from '@testing-library/react'
 import Downshift from '../'
 
 beforeEach(() => jest.spyOn(console, 'error').mockImplementation(() => {}))
@@ -36,7 +36,7 @@ test('selectItemAtIndex does nothing if there is no item at that index', () => {
   expect(childrenSpy).not.toHaveBeenCalled()
 })
 
-test('selectItemAtIndex can select item that is an empty string', () => {
+test('selectItemAtIndex can select item that is an empty string', async () => {
   const items = ['Chess', '']
   const children = ({getItemProps}) => (
     <div>
@@ -49,18 +49,22 @@ test('selectItemAtIndex can select item that is an empty string', () => {
   )
   const {selectItemAtIndex, childrenSpy} = setup({children})
   selectItemAtIndex(1)
-  expect(childrenSpy).toHaveBeenLastCalledWith(
-    expect.objectContaining({selectedItem: ''}),
+  await waitFor(() =>
+    expect(childrenSpy).toHaveBeenLastCalledWith(
+      expect.objectContaining({selectedItem: ''}),
+    ),
   )
 })
 
-test('toggleMenu can take no arguments at all', () => {
+test('toggleMenu can take no arguments at all', async () => {
   const {toggleMenu, childrenSpy} = setup()
   toggleMenu()
-  expect(childrenSpy).toHaveBeenCalledWith(
-    expect.objectContaining({
-      isOpen: true,
-    }),
+  await waitFor(() =>
+    expect(childrenSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        isOpen: true,
+      }),
+    ),
   )
 })
 
@@ -130,11 +134,14 @@ test('should not log error during strict mode during reset', () => {
   expect(console.error.mock.calls).toHaveLength(0)
 })
 
-test('can use setState for ultimate power', () => {
+test('can use setState for ultimate power', async () => {
   const {childrenSpy, setState} = setup()
   childrenSpy.mockClear()
-  setState({isOpen: true, selectedItem: 'hi'})
-  expect(childrenSpy).toHaveBeenCalledTimes(1)
+
+  act(() => {
+    setState({isOpen: true, selectedItem: 'hi'})
+  })
+  await waitFor(() => expect(childrenSpy).toHaveBeenCalledTimes(1))
   expect(childrenSpy).toHaveBeenCalledWith(
     expect.objectContaining({isOpen: true, selectedItem: 'hi'}),
   )
