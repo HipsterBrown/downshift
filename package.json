@@ -2,9 +2,9 @@
   "name": "@hipsterbrown/downshift",
   "version": "7.0.6",
   "description": "🏎 A set of primitives to build simple, flexible, WAI-ARIA compliant React autocomplete, combobox or select dropdown components.",
-  "main": "dist/downshift.cjs.js",
-  "react-native": "dist/downshift.native.cjs.js",
-  "module": "dist/downshift.esm.js",
+  "main": "dist/@hipsterbrown/downshift.cjs.js",
+  "react-native": "dist/@hipsterbrown/downshift.native.cjs.js",
+  "module": "dist/@hipsterbrown/downshift.esm.js",
   "typings": "typings/index.d.ts",
   "sideEffects": false,
   "scripts": {
